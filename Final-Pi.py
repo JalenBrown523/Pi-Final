@@ -80,10 +80,10 @@ class RecipeFrame(Frame):
         RecipeFrame.instructLabel.pack(anchor=N)
 
         # setup scroll bar
-        RecipeFrame.scroll = Scrollbar(self)
+        RecipeFrame.scroll = Scrollbar(window)
         RecipeFrame.scroll.pack(side=RIGHT, fill=Y)
         # create list
-        RecipeFrame.myList = Listbox(self)
+        RecipeFrame.myList = Listbox(window)
         RecipeFrame.myList.pack(side=TOP, expand=1, fill=BOTH)
         RecipeFrame.myList.bind('<<ListboxSelect>>', self.expandRecipe)
         # link scroll bar to listbox
