@@ -17,7 +17,7 @@ class ControlFrame(Frame):
         self.pack(side=TOP, expand=1, fill=BOTH)
 
         # Create label that tells the user that to put in textbox
-        ControlFrame.instructLabel = Label(self, text="What Ingredients do you have?")
+        ControlFrame.instructLabel = Label(self, text="Enter you ingredients")
         ControlFrame.instructLabel.pack(anchor=N)
 
         # Creates response Label
@@ -26,7 +26,7 @@ class ControlFrame(Frame):
 
         # Creates the Textbox
         ControlFrame.player_input = Entry(self, bg="white")
-        # functin that will process input from user
+        # function that will process input from user
         ControlFrame.player_input.bind("<Return>", self.process)
         ControlFrame.player_input.pack(side=BOTTOM, fill=X)
         ControlFrame.player_input.focus()
@@ -36,7 +36,7 @@ class ControlFrame(Frame):
         action = ControlFrame.player_input.get().lower()
         response = "invalid input try again"
 
-        # If you put peanut butter it our program counts peanut and butter as two different ingredients
+        # peanut butter would be tow different ingredients
         ingredients = action.split()
         response = requests.get(
             f"https://api.spoonacular.com/recipes/findByIngredients?apiKey={api_key}&ingredients={','.join(ingredients)}&number=5&ranking=2")
@@ -76,7 +76,7 @@ class RecipeFrame(Frame):
         RecipeFrame.RecipeInfo = Text(self, state=DISABLED)
         RecipeFrame.RecipeInfo.pack(side=TOP, fill=BOTH)
 
-        RecipeFrame.instructLabel = Label(self, text="Recipes")
+        RecipeFrame.instructLabel = Label(self, text="Find a recipe")
         RecipeFrame.instructLabel.pack(anchor=N)
 
         # setup scroll bar
