@@ -17,11 +17,11 @@ class ControlFrame(Frame):
         self.pack(side=TOP, expand=1, fill=BOTH)
 
         # Create label that tells the user that to put in textbox
-        ControlFrame.instructLabel = Label(self, text="What Ingredients do you have?")
+        ControlFrame.instructLabel = Label(self, text="List your ingredients")
         ControlFrame.instructLabel.pack(anchor=N)
 
         # Creates response Label
-        ControlFrame.responseLabel = Label(self, text="response", bg="white")
+        ControlFrame.responseLabel = Label(self, text="response", bg="black")
         ControlFrame.responseLabel.pack(side=TOP, fill=BOTH, ipady=100)
 
         # Creates the Textbox
@@ -103,7 +103,7 @@ HEIGHT = 600
 
 # create the window
 window = Tk()
-window.title("Recipies")
+window.title("Find a recipe")
 # window.geometry(f"{WIDTH}x{HEIGHT}")
 window.minsize(WIDTH, HEIGHT)
 # window.maxsize(WIDTH, HEIGHT)
