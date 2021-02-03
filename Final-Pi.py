@@ -17,16 +17,16 @@ class ControlFrame(Frame):
         self.pack(side=TOP, expand=1, fill=BOTH)
 
         # Create label that tells the user that to put in textbox
-        ControlFrame.instructLabel = Label(self, text="List your ingredients")
+        ControlFrame.instructLabel = Label(self, text="What Ingredients do you have?")
         ControlFrame.instructLabel.pack(anchor=N)
 
         # Creates response Label
-        ControlFrame.responseLabel = Label(self, text="response", bg="black")
-        ControlFrame.responseLabel.pack(side=TOP, fill=BOTH, ipady=100)
+        ControlFrame.responseLabel = Label(self, text="response", bg="white")
+        ControlFrame.responseLabel.pack(side=TOP, fill=BOTH)
 
         # Creates the Textbox
         ControlFrame.player_input = Entry(self, bg="white")
-        # function that will process input from user
+        # functin that will process input from user
         ControlFrame.player_input.bind("<Return>", self.process)
         ControlFrame.player_input.pack(side=BOTTOM, fill=X)
         ControlFrame.player_input.focus()
@@ -54,6 +54,7 @@ class ControlFrame(Frame):
 
 class Recipe():
     def __init__(self, recipeJSON):
+        self.id = recipeJSON["id"]
         self.title = recipeJSON["title"]
         self.img = recipeJSON["image"]
         self.likes = recipeJSON["likes"]
@@ -71,6 +72,9 @@ class RecipeFrame(Frame):
 
     def setupGUI(self):
         self.pack(side=TOP, expand=1, fill=BOTH)
+
+        RecipeFrame.RecipeInfo = Text(self, state=DISABLED)
+        RecipeFrame.RecipeInfo.pack(side=TOP, fill=BOTH)
 
         RecipeFrame.instructLabel = Label(self, text="Recipes")
         RecipeFrame.instructLabel.pack(anchor=N)
@@ -91,8 +95,17 @@ class RecipeFrame(Frame):
                                   f"{Recipe.title}  |  Likes: {Recipe.likes}  |  Missing Ingredients: {Recipe.ingMiss}")
 
     def expandRecipe(self, event):
-        # TODO Check if this recipe is already displayed
-        print(ControlFrame.Recipies[RecipeFrame.myList.curselection()[0]])
+        # makes this only run if an item is selected
+        if (RecipeFrame.myList.curselection()):
+            recipe = ControlFrame.Recipies[RecipeFrame.myList.curselection()[0]]
+            # TODO Check if this recipe is already displayed
+            response = requests.get(f"https://api.spoonacular.com/recipes/{recipe.id}/information?apiKey={api_key}")
+            responseJSON = response.json()
+            RecipeFrame.RecipeInfo.config(state=NORMAL)
+            RecipeFrame.RecipeInfo.delete("1.0", END)
+            sumarry = responseJSON["summary"]
+            RecipeFrame.RecipeInfo.insert(END, f"{recipe.title}\n\n{sumarry}")
+            # print(RecipeFrame.myList.curselection()[0])
 
 
 ##################################################################################
@@ -103,7 +116,7 @@ HEIGHT = 600
 
 # create the window
 window = Tk()
-window.title("Find a recipe")
+window.title("Recipies")
 # window.geometry(f"{WIDTH}x{HEIGHT}")
 window.minsize(WIDTH, HEIGHT)
 # window.maxsize(WIDTH, HEIGHT)
