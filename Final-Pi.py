@@ -13,23 +13,24 @@ class ControlFrame(Frame):
 
     # sets up the GUI
     def setupGUI(self):
-        # Makes the frame the size of the window
-        self.pack(side=TOP, expand=1, fill=BOTH)
-
         # Create label that tells the user that to put in textbox
-        ControlFrame.instructLabel = Label(self, text="Enter you ingredients")
+        ControlFrame.instructLabel = Label(self, text="Enter you ingredients", font='verdana 18')
         ControlFrame.instructLabel.pack(anchor=N)
 
         # Creates response Label
-        ControlFrame.responseLabel = Label(self, text="response", bg="white")
+        ControlFrame.responseLabel = Label(self, bg="white")
         ControlFrame.responseLabel.pack(side=TOP, fill=BOTH)
 
         # Creates the Textbox
         ControlFrame.player_input = Entry(self, bg="white")
+
         # function that will process input from user
         ControlFrame.player_input.bind("<Return>", self.process)
         ControlFrame.player_input.pack(side=BOTTOM, fill=X)
         ControlFrame.player_input.focus()
+
+        # Makes the frame the size of the window
+        self.pack(side=TOP, expand=1, fill=BOTH)
 
     def process(self, event):
         # take the input from the input line and sets them all to lower case
@@ -53,6 +54,8 @@ class ControlFrame(Frame):
 
 
 class Recipe():
+    # JavaScript Object Notation(JSON) converts Python objects to JavaScript
+    # This allows for communication b/t APi's & databases
     def __init__(self, recipeJSON):
         self.id = recipeJSON["id"]
         self.title = recipeJSON["title"]
@@ -76,7 +79,7 @@ class RecipeFrame(Frame):
         RecipeFrame.RecipeInfo = Text(self, state=DISABLED)
         RecipeFrame.RecipeInfo.pack(side=TOP, fill=BOTH)
 
-        RecipeFrame.instructLabel = Label(self, text="Find a recipe")
+        RecipeFrame.instructLabel = Label(self, text="Your list of recipes")
         RecipeFrame.instructLabel.pack(anchor=N)
 
         # setup scroll bar
