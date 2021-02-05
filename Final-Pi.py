@@ -1,61 +1,72 @@
 from tkinter import *
 import requests
 
-
 class ControlFrame(Frame):
-    # the constructor
+    # The constructor
     def __init__(self, parent):
-        # call the constructor in the superclass
+        # Call the constructor in the superclass
         Frame.__init__(self, parent)
 
     def __str__(self):
         pass
 
-    # sets up the GUI
+    # Sets up the GUI
     def setupGUI(self):
-        # Create label that tells the user that to put in textbox
-        ControlFrame.instructLabel = Label(self, text="Enter you ingredients", font='verdana 18')
-        ControlFrame.instructLabel.pack(anchor=N)
-
-        # Creates response Label
-        ControlFrame.responseLabel = Label(self, bg="white")
-        ControlFrame.responseLabel.pack(side=TOP, fill=BOTH)
-
-        # Creates the Textbox
-        ControlFrame.player_input = Entry(self, bg="white")
-
-        # function that will process input from user
-        ControlFrame.player_input.bind("<Return>", self.process)
-        ControlFrame.player_input.pack(side=BOTTOM, fill=X)
-        ControlFrame.player_input.focus()
-
         # Makes the frame the size of the window
         self.pack(side=TOP, expand=1, fill=BOTH)
 
+        # Enter ingredients' label
+        ControlFrame.instructLabel = Label(self, text="Enter ingredients", font='verdana 18')
+        ControlFrame.instructLabel.pack(anchor=N)
+
+        # Creates the Textbox
+        ControlFrame.user_input = Entry(self, bg="white", font='kristen 16')
+
+        # Function that will process input from user
+        ControlFrame.user_input.bind("<Return>", self.process)
+        ControlFrame.user_input.pack(side=BOTTOM, fill=X)
+        ControlFrame.user_input.focus()
+
     def process(self, event):
-        # take the input from the input line and sets them all to lower case
-        action = ControlFrame.player_input.get().lower()
-        response = "invalid input try again"
+        # Resets the recepie list when one a word is entered
+        IngredientFrame.myList.delete(0, END)
 
-        # peanut butter would be tow different ingredients
+        # Take the input from the input line and sets them all to lower case
+        action = ControlFrame.user_input.get().lower()
+
+        # No two word ingredients (e.g. rice cakes = rice, cakes)
         ingredients = action.split()
-        response = requests.get(
-            f"https://api.spoonacular.com/recipes/findByIngredients?apiKey={api_key}&ingredients={','.join(ingredients)}&number=5&ranking=2")
-        responseJSON = response.json()
-        # create list of recipe items
-        ControlFrame.Recipies = [Recipe(recipeJSON) for recipeJSON in responseJSON]
 
-        # add recipies to GUI
-        for recipe in ControlFrame.Recipies:
+        # Sets response to the retrieved recipes from the website
+        response = requests.get(
+            f"https://api.spoonacular.com/recipes/complexSearch?apiKey={api_key}&includeIngredients={','.join(ingredients)}&number=2&fillIngredients=true&addRecipeInformation=true")
+        responseJSON = response.json()
+
+        # Create list of recipe items
+        ControlFrame.Recipes = [Recipe(recipeJSON) for recipeJSON in responseJSON["results"]]
+
+        # If responsejson is an empy string(ex. no response) then chage the text of the instruction lable
+        # Handles invalid input from the user
+        if (responseJSON == []):
+            print("Search Error: Invalid ingredient/No results")
+            ControlFrame.instructLabel.config(text="invalid input!!!!!!!, please try again.", fg="red",
+                                              font="helvetica 18 bold")
+
+        else:
+            ControlFrame.instructLabel.config(text="What Ingredients do you have?", fg="black",
+                                              font="helvetica 18 bold")
+
+        # Ddd recipes to GUI
+        for recipe in ControlFrame.Recipes:
             rFrame.addRecipe(recipe)
 
-        # change response label text
-        ControlFrame.responseLabel.configure(text=response.elapsed)
+        # Resets the Textbox after input
+        ControlFrame.user_input.delete(0, END)
 
 
 class Recipe():
     # JavaScript Object Notation(JSON) converts Python objects to JavaScript
-    # This allows for communication b/t APi's & databases
+    # Allows for communication b/t APi's & databases b/c Python objects cannot
     def __init__(self, recipeJSON):
         self.id = recipeJSON["id"]
         self.title = recipeJSON["title"]
@@ -68,69 +79,73 @@ class Recipe():
         return self.title
 
 
-class RecipeFrame(Frame):
+class IngredientFrame(Frame):
     def __init__(self, parent):
-        # call the constructor in the superclass
+        # Call the constructor in the superclass
         Frame.__init__(self, parent)
 
     def setupGUI(self):
         self.pack(side=TOP, expand=1, fill=BOTH)
 
-        RecipeFrame.RecipeInfo = Text(self, state=DISABLED)
-        RecipeFrame.RecipeInfo.pack(side=TOP, fill=BOTH)
+        IngredientFrame.RecipeInfo = Text(self, state=DISABLED)
+        IngredientFrame.RecipeInfo.pack(side=TOP, fill=BOTH)
 
-        RecipeFrame.instructLabel = Label(self, text="Your list of recipes")
-        RecipeFrame.instructLabel.pack(anchor=N)
+        IngredientFrame.instructLabel = Label(self, text="Your list of recipes")
+        IngredientFrame.instructLabel.pack(anchor=N)
 
-        # setup scroll bar
-        RecipeFrame.scroll = Scrollbar(window)
-        RecipeFrame.scroll.pack(side=RIGHT, fill=Y)
-        # create list
-        RecipeFrame.myList = Listbox(window)
-        RecipeFrame.myList.pack(side=TOP, expand=1, fill=BOTH)
-        RecipeFrame.myList.bind('<<ListboxSelect>>', self.expandRecipe)
-        # link scroll bar to listbox
-        RecipeFrame.myList.config(yscrollcommand=RecipeFrame.scroll.set)
-        RecipeFrame.scroll.config(command=RecipeFrame.myList.yview)
+        # Setup scroll bar
+        IngredientFrame.scroll = Scrollbar(window)
+        IngredientFrame.scroll.pack(side=RIGHT, fill=Y)
+
+        # Create list
+        IngredientFrame.myList = Listbox(window)
+        IngredientFrame.myList.pack(side=TOP, expand=1, fill=BOTH)
+        IngredientFrame.myList.bind('<<ListboxSelect>>', self.expandRecipe)
+
+        # Link scroll bar to listbox
+        IngredientFrame.myList.config(yscrollcommand=IngredientFrame.scroll.set)
+        IngredientFrame.scroll.config(command=IngredientFrame.myList.yview)
 
     def addRecipe(self, Recipe):
-        RecipeFrame.myList.insert(END,
+        IngredientFrame.myList.insert(END,
                                   f"{Recipe.title}  |  Likes: {Recipe.likes}  |  Missing Ingredients: {Recipe.ingMiss}")
 
     def expandRecipe(self, event):
-        # makes this only run if an item is selected
-        if (RecipeFrame.myList.curselection()):
-            recipe = ControlFrame.Recipies[RecipeFrame.myList.curselection()[0]]
+        # Runs if a recipe is selected
+        if (IngredientFrame.myList.curselection()):
+            recipe = ControlFrame.Recipes[IngredientFrame.myList.curselection()[0]]
             # TODO Check if this recipe is already displayed
             response = requests.get(f"https://api.spoonacular.com/recipes/{recipe.id}/information?apiKey={api_key}")
             responseJSON = response.json()
-            RecipeFrame.RecipeInfo.config(state=NORMAL)
-            RecipeFrame.RecipeInfo.delete("1.0", END)
+            IngredientFrame.RecipeInfo.config(state=NORMAL)
+            IngredientFrame.RecipeInfo.delete("1.0", END)
             sumarry = responseJSON["summary"]
-            RecipeFrame.RecipeInfo.insert(END, f"{recipe.title}\n\n{sumarry}")
-            # print(RecipeFrame.myList.curselection()[0])
+            IngredientFrame.RecipeInfo.insert(END, f"{recipe.title}\n\n{sumarry}")
 
 
 ##################################################################################
 api_key = "b29344da13414323bac320e823e7736a"
-# the default size of the GUI is 800x600
+# The default size of the GUI is 800x600
 WIDTH = 800
 HEIGHT = 600
 
-# create the window
+# Create the window
 window = Tk()
-window.title("Recipies")
-# window.geometry(f"{WIDTH}x{HEIGHT}")
+window.title("Find A Recipe")
+window.geometry(f"{WIDTH}x{HEIGHT}")
 window.minsize(WIDTH, HEIGHT)
-# window.maxsize(WIDTH, HEIGHT)
 
-# create the controls GUI as a Tkinter Frame inside the window
+# Create the controls GUI as a Tkinter Frame inside the window
 cFrame = ControlFrame(window)
 cFrame.setupGUI()
 
-# create the recipe display frame inside the window
-rFrame = RecipeFrame(window)
+# Create the recipe display frame inside the window
+rFrame = IngredientFrame(window)
 rFrame.setupGUI()
 
-# wait for the window to close
+# Wait for the window to close
 window.mainloop()
+
+
+
+
