@@ -1,5 +1,4 @@
 from tkinter import *
-import re
 import requests
 # PIL library to import images
 
@@ -18,12 +17,12 @@ class ControlFrame(Frame):
         self.pack(side=TOP, expand=1, fill=BOTH)
 
         # Enter ingredients' label
-        ControlFrame.instructLabel = Label(self, text="Enter ingredients", font='verdana 18')
+        ControlFrame.instructLabel = Label(self, text="Enter Some Ingredients", font='verdana 15')
         ControlFrame.instructLabel.pack(anchor=N)
 
         # Creates the Textbox
         ControlFrame.user_input = Entry(self, bg="white", font='kristen 16')
-        ControlFrame.user_input.pack(side=BOTTOM, fill=X)
+        ControlFrame.user_input.pack(side=TOP, fill=X)
         # Initial input is set('focused') on the Textbox
         ControlFrame.user_input.focus()
 
@@ -31,7 +30,7 @@ class ControlFrame(Frame):
         ControlFrame.user_input.bind("<Return>", self.process)
 
     def process(self, event):
-        # Resets the recepie list when one a word is entered
+        # Resets the recepe list when one a word is entered
         ResultFrame.myList.delete(0, END)
 
         # Take the input from the input line and sets them all to lower case
@@ -51,13 +50,12 @@ class ControlFrame(Frame):
         # If responsejson is an empTy string(ex. no response) then change the text of the instruction label
         # Handles invalid input from the user
         if (responseJSON == []):
-            print("Search Error: Invalid ingredient/No results")
-            ControlFrame.instructLabel.config(text="invalid input!!!!!!!, please try again.", fg="red",
-                                              font="helvetica 18 bold")
+            ControlFrame.instructLabel.config(text="Search Error\n Check Spelling", fg="red",
+                                              font="helvetica 15")
 
         else:
-            ControlFrame.instructLabel.config(text="What Ingredients do you have?", fg="black",
-                                              font="helvetica 18 bold")
+            ControlFrame.instructLabel.config(text="Results", fg="black",
+                                              font="helvetica 15")
 
         # Adds recipes to the list
         for recipe in ControlFrame.Recipes:
@@ -102,19 +100,21 @@ class ResultFrame(Frame):
         ResultFrame.Frame = Frame(window)
         ResultFrame.Frame.pack(side=TOP, fill=X)
 
-        ResultFrame.RecipeInfo = Text(self, state=DISABLED, wrap=WORD, font='verdana')
+        ResultFrame.RecipeInfo = Text(self, state=DISABLED, wrap=WORD, font='verdana 12', height=10, width=40)
 
         ResultFrame.instructLabel = Label(ResultFrame.Frame, text="Your list of recipes")
         ResultFrame.instructLabel.pack(anchor=N, pady=5)
 
+        ResultFrame.BackButton = Button(ResultFrame.Frame, text="Back to options", command=rFrame)
+
+        # Create list
+        ResultFrame.myList = Listbox(window, font='Times 12')
+        ResultFrame.myList.pack(side=TOP, expand=1, fill=BOTH)
+        ResultFrame.myList.bind('<<ListboxSelect>>', self.expandRecipe)
+
         # Setup scroll bar
         ResultFrame.scroll = Scrollbar(window)
         ResultFrame.scroll.pack(side=RIGHT, fill=Y)
-
-        # Create list
-        ResultFrame.myList = Listbox(window, font='Times')
-        ResultFrame.myList.pack(side=TOP, expand=1, fill=BOTH)
-        ResultFrame.myList.bind('<<ListboxSelect>>', self.expandRecipe)
 
         # Link scroll option to listbox
         ResultFrame.myList.config(yscrollcommand=ResultFrame.scroll.set)
@@ -162,7 +162,4 @@ rFrame.setupGUI()
 
 # Wait for the window to close
 window.mainloop()
-
-
-
 
