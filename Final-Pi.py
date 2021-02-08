@@ -2,6 +2,7 @@ from tkinter import *
 import requests
 # PIL library to import images
 
+
 class ControlFrame(Frame):
     # The constructor
     def __init__(self, parent):
@@ -17,25 +18,22 @@ class ControlFrame(Frame):
         self.pack(side=TOP, expand=1, fill=BOTH)
 
         # Enter ingredients' label
-        ControlFrame.instructLabel = Label(self, text="Enter Some Ingredients", font='verdana 15')
+        ControlFrame.instructLabel = Label(
+            self, text="Enter Some Ingredients", font='verdana 15')
         ControlFrame.instructLabel.pack(anchor=N)
 
         # Creates the Textbox
         ControlFrame.user_input = Entry(self, bg="white", font='kristen 16')
         ControlFrame.user_input.pack(side=TOP, fill=X)
-        # Initial input is set('focused') on the Textbox
+        # Cursor is set('focused') on the Textbox
         ControlFrame.user_input.focus()
 
         # Binds enter key to process input from user
         ControlFrame.user_input.bind("<Return>", self.process)
 
     def process(self, event):
-        # Resets the recepe list when one a word is entered
-        ResultFrame.myList.delete(0, END)
-
         # Take the input from the input line and sets them all to lower case
         action = ControlFrame.user_input.get().lower()
-
         # No two word ingredients (e.g. rice cakes = rice, cakes)
         ingredients = action.split()
 
@@ -45,17 +43,18 @@ class ControlFrame(Frame):
         responseJSON = response.json()
 
         # Create list of recipe items
-        ControlFrame.Recipes = [Recipe(recipeJSON) for recipeJSON in responseJSON["results"]]
+        ControlFrame.Recipes = [Recipe(recipeJSON)
+                                for recipeJSON in responseJSON]
 
         # If responsejson is an empTy string(ex. no response) then change the text of the instruction label
         # Handles invalid input from the user
         if (responseJSON == []):
-            ControlFrame.instructLabel.config(text="Search Error\n Check Spelling", fg="red",
-                                              font="helvetica 15")
+            ControlFrame.instructLabel.config(
+                text="Search Error\n Check Spelling", fg="red", font="helvetica 15")
 
         else:
-            ControlFrame.instructLabel.config(text="Results", fg="black",
-                                              font="helvetica 15")
+            ControlFrame.instructLabel.config(
+                text="Results", fg="black", font="helvetica 15")
 
         # Adds recipes to the list
         for recipe in ControlFrame.Recipes:
@@ -63,6 +62,8 @@ class ControlFrame(Frame):
 
         # Resets the Textbox after input
         ControlFrame.user_input.delete(0, END)
+
+        ControlFrame.responseLabel.configure(text=response.elasped)
 
 
 class Recipe():
@@ -85,27 +86,17 @@ class ResultFrame(Frame):
         # Call the constructor in the superclass
         Frame.__init__(self, parent)
 
-    def listRecipes(self):
-        rFrame.pack_forget()
-        cFrame.pack(side=TOP, expand=1, fill=BOTH)
-        ResultFrame.Frame.pack_forget()
-        ResultFrame.Frame.pack(side=TOP , fill=X)
-        ResultFrame.BackButton.pack_forget()
-
-
     def setupGUI(self):
         self.pack(side=TOP, expand=1, fill=BOTH)
 
-        # Creates the bottom window
-        ResultFrame.Frame = Frame(window)
-        ResultFrame.Frame.pack(side=TOP, fill=X)
+        ResultFrame.RecipeInfo = Text(self, state=DISABLED)
+        ResultFrame.RecipeInfo.pack(side=TOP, fill=BOTH)
 
-        ResultFrame.RecipeInfo = Text(self, state=DISABLED, wrap=WORD, font='verdana 12', height=10, width=40)
+        ResultFrame.instructLabel = Label(self, text="Your list of recipes")
+        ResultFrame.instructLabel.pack(anchor=N)
 
-        ResultFrame.instructLabel = Label(ResultFrame.Frame, text="Your list of recipes")
-        ResultFrame.instructLabel.pack(anchor=N, pady=5)
-
-        ResultFrame.BackButton = Button(ResultFrame.Frame, text="Back to options", command=rFrame)
+        ResultFrame.BackButton = Button(
+            self, text="Back to options", command=rFrame)
 
         # Create list
         ResultFrame.myList = Listbox(window, font='Times 12')
@@ -130,7 +121,8 @@ class ResultFrame(Frame):
             recipe = ControlFrame.Recipes[ResultFrame.myList.curselection()[0]]
 
             # TODO Check if this recipe is already displayed
-            response = requests.get(f"https://api.spoonacular.com/recipes/{recipe.id}/information?apiKey={api_key}")
+            response = requests.get(
+                f"https://api.spoonacular.com/recipes/{recipe.id}/information?apiKey={api_key}")
             responseJSON = response.json()
             ResultFrame.RecipeInfo.config(state=NORMAL)
 
@@ -162,4 +154,3 @@ rFrame.setupGUI()
 
 # Wait for the window to close
 window.mainloop()
-

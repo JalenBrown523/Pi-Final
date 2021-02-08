@@ -27,7 +27,6 @@
 
 import tkinter
 from io import BytesIO
-
 from PIL import Image
 
 # --------------------------------------------------------------------
@@ -189,7 +188,8 @@ class PhotoImage:
                         # PyPy is using an FFI CDATA element
                         # (Pdb) self.tk.interp
                         #  <cdata 'Tcl_Interp *' 0x3061b50>
-                        _imagingtk.tkinit(int(ffi.cast("uintptr_t", tk.interp)), 1)
+                        _imagingtk.tkinit(
+                            int(ffi.cast("uintptr_t", tk.interp)), 1)
                     else:
                         _imagingtk.tkinit(tk.interpaddr(), 1)
                 except AttributeError:
