@@ -1,4 +1,5 @@
 from tkinter import *
+import re
 import requests
 # PIL library to import images
 
@@ -27,7 +28,6 @@ class ControlFrame(Frame):
         ControlFrame.user_input.pack(side=TOP, fill=X)
         # Cursor is set('focused') on the Textbox
         ControlFrame.user_input.focus()
-
         # Binds enter key to process input from user
         ControlFrame.user_input.bind("<Return>", self.process)
 
@@ -128,28 +128,41 @@ class ResultFrame(Frame):
 
             # Clear textbox
             ResultFrame.RecipeInfo.delete("1.0", END)
-            sumarry = responseJSON["summary"]
-            ResultFrame.RecipeInfo.insert(END, f"{recipe.title}\n\n{sumarry}")
+            summary = responseJSON["summary"]
+            notyou = summary.replace("<b>", "").replace("<b>", "")
+            ResultFrame.RecipeInfo.insert(END, f"{recipe.title}\n\n{notyou}")
+            ResultFrame.formatSummary(self, summary, recipe)
+
+    def formatSummary(self, summary, recipe):
+        word_connect = re.finditer(r"<b>"(.+?) <\b >", summary)
+        i = 0
+        for found_word in word_connect:
+            start = ResultFrame.RecipeInfo.index(f"1.0+{word_found.start()+len(recipe.title) + 2 - i*7} chars")")
+            end=RecipeFrame.RecipeSum.index(
+                f"1.0+{word_found.end()+len(recipe.title) + 2 - (i+1)*7} chars")
+            ResultFrame.RecipeInfo.tag_add('bold', start, end)
+            i += 1
+            ResultFrame.RecipeInfo.tag_configure('bold', font = "Hlevetica 12")
 
 
 ##################################################################################
-api_key = "b29344da13414323bac320e823e7736a"
+api_key="b29344da13414323bac320e823e7736a"
 # The default size of the GUI is 800x600
-WIDTH = 800
-HEIGHT = 600
+WIDTH=800
+HEIGHT=600
 
 # Create the window
-window = Tk()
+window=Tk()
 window.title("Find A Recipe")
 window.geometry(f"{WIDTH}x{HEIGHT}")
 window.minsize(WIDTH, HEIGHT)
 
 # Create the controls GUI as a Tkinter Frame inside the window
-cFrame = ControlFrame(window)
+cFrame=ControlFrame(window)
 cFrame.setupGUI()
 
 # Create the recipe display frame inside the window
-rFrame = ResultFrame(window)
+rFrame=ResultFrame(window)
 rFrame.setupGUI()
 
 # Wait for the window to close
