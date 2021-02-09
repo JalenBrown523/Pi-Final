@@ -1,6 +1,9 @@
 from tkinter import *
 import re
 import requests
+import ImageTk
+from io import BytesIO
+from PIL import Image
 # PIL library to import images
 
 
@@ -89,14 +92,18 @@ class ResultFrame(Frame):
     def setupGUI(self):
         self.pack(side=TOP, expand=1, fill=BOTH)
 
-        ResultFrame.RecipeInfo = Text(self, state=DISABLED)
-        ResultFrame.RecipeInfo.pack(side=TOP, fill=BOTH)
+        ResultFrame.RecipeInfo = Text(
+            self, state=DISABLED, wrap=WORD, font='Times')
+        ResultFrame.RecipeInfo.pack(side=RIGHT, fill=BOTH)
 
         ResultFrame.instructLabel = Label(self, text="Your list of recipes")
         ResultFrame.instructLabel.pack(anchor=N)
 
         ResultFrame.BackButton = Button(
             self, text="Back to options", command=rFrame)
+
+        ResultFrame.img = Label(self)
+        ResultFrame.img.pack(side=RIGHT, fill=BOTH)
 
         # Create list
         ResultFrame.myList = Listbox(window, font='Times 12')
@@ -120,49 +127,82 @@ class ResultFrame(Frame):
         if (ResultFrame.myList.curselection()):
             recipe = ControlFrame.Recipes[ResultFrame.myList.curselection()[0]]
 
-            # TODO Check if this recipe is already displayed
-            response = requests.get(
-                f"https://api.spoonacular.com/recipes/{recipe.id}/information?apiKey={api_key}")
-            responseJSON = response.json()
+            # Textbox editable
             ResultFrame.RecipeInfo.config(state=NORMAL)
 
-            # Clear textbox
-            ResultFrame.RecipeInfo.delete("1.0", END)
-            summary = responseJSON["summary"]
-            notyou = summary.replace("<b>", "").replace("<b>", "")
-            ResultFrame.RecipeInfo.insert(END, f"{recipe.title}\n\n{notyou}")
-            ResultFrame.formatSummary(self, summary, recipe)
+            # Recipes info won't be repeated
+            if (hasattr(recipe, ("summary"))):
+                # clear textbox
+                ResultFrame.RecipeInfo.delete("1.0", END)
+                cleanSum = recipe.summary.replace("<b>", "").replace("<b>", "")
+                ResultFrame.RecipeInfo.insert(
+                    END, f"{recipe.title}\n\n{cleanSum}")
+                ResultFrame.formatSummary(self, recipe)
+
+            else:
+                response = requests.get(
+                    f"https://api.spoonacular.com/recipes/{recipe.id}/information?apiKey={api_key}")
+                responseJSON = response.json()
+                ResultFrame.RecipeInfo.config(state=NORMAL)
+
+                # Clear textbox
+                ResultFrame.RecipeInfo.delete("1.0", END)
+                summary = responseJSON["summary"]
+                # Discard similir recipes
+                summary = summary[0: summar.rfind("Try <a href=")]
+
+                ControlFrame.Recipes[ResultFrame.myList.curselection()[
+                    0]].summary = summary
+                cleanSum = summary.replace("<b>", "").replace("</b>", "")
+                ResultFrame.RecipeInfo.insert(
+                    END, f"{recipe.title}\n\n{cleanSum}")
+                # Gives the summary box bold text
+                ResultFrame.formatSummary(
+                    self, ControlFrame.Recipies[ResultFrame.myList.curselection()[0]])
+            # check if recipe already has the image downloaded
+            if (hasattr(ControlFrame.Recipies[ResultFrame.myList.curselection()[0]], "photo")):
+                ResultFrame.imgLabel.config(
+                    image=ControlFrame.Recipies[ResultFrame.myList.curselection()[0]].photo)
+            else:
+                response = requests.get(recipe.img)
+                image = Image.open(BytesIO(response.content))
+                photo = ImageTk.PhotoImage(image)
+                # save photo to og recipe object
+                ControlFrame.Recipes[ResultFrame.myList.curselection()[
+                    0]].photo = photo
+                ResultFrame.imgLabel.config(image=photo)
 
     def formatSummary(self, summary, recipe):
-        word_connect = re.finditer(r"<b>"(.+?) <\b >", summary)
+        word_connect = re.finditer(r"<b>(.+?) <\b >", summary)
         i = 0
         for found_word in word_connect:
-            start = ResultFrame.RecipeInfo.index(f"1.0+{word_found.start()+len(recipe.title) + 2 - i*7} chars")")
-            end=RecipeFrame.RecipeSum.index(
-                f"1.0+{word_found.end()+len(recipe.title) + 2 - (i+1)*7} chars")
+            start = ResultFrame.RecipeInfo.index(
+                f"1.0+{found_word.start()+len(recipe.title) + 2 - i*7} chars")
+            end = ResultFrame.RecipeInfo.index(
+                f"1.0+{found_word.end()+len(recipe.title) + 2 - (i+1)*7} chars")
             ResultFrame.RecipeInfo.tag_add('bold', start, end)
             i += 1
-            ResultFrame.RecipeInfo.tag_configure('bold', font = "Hlevetica 12")
+            ResultFrame.RecipeInfo.tag_configure('bold', font="Times 12")
 
 
 ##################################################################################
-api_key="b29344da13414323bac320e823e7736a"
+api_key = "b29344da13414323bac320e823e7736a"
 # The default size of the GUI is 800x600
-WIDTH=800
-HEIGHT=600
+WIDTH = 800
+HEIGHT = 600
 
 # Create the window
-window=Tk()
+window = Tk()
 window.title("Find A Recipe")
 window.geometry(f"{WIDTH}x{HEIGHT}")
 window.minsize(WIDTH, HEIGHT)
 
 # Create the controls GUI as a Tkinter Frame inside the window
-cFrame=ControlFrame(window)
+cFrame = ControlFrame(window)
 cFrame.setupGUI()
 
 # Create the recipe display frame inside the window
-rFrame=ResultFrame(window)
+rFrame = ResultFrame(window)
 rFrame.setupGUI()
 
 # Wait for the window to close
