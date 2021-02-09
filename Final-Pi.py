@@ -104,17 +104,16 @@ class ResultFrame(Frame):
     def setupGUI(self):
         self.pack(side=TOP, expand=1, fill=BOTH)
 
-        # Building the bottom frame
-        ResultFrame.RecipeInfo = Text(
-            self, state=DISABLED, wrap=WORD, font='Times')
-        ResultFrame.RecipeInfo.pack(side=RIGHT, fill=BOTH)
+        # Builds bottom frame
+        bottomFrame = Frame(window)
+        bottomFrame.pack(side=TOP, fill=X)
 
-        ResultFrame.instructLabel = Label(self, text="Your list of recipes")
+        ResultFrame.instructLabel = Label(bottomFrame, text="Your list of recipes")
         ResultFrame.instructLabel.pack(anchor=N)
 
         # Adds back button
         ResultFrame.BackButton = Button(
-            self, text="Back to options", command=rFrame)
+            self, text="Back to list", command=rFrame)
 
         ResultFrame.img = Label(self)
         ResultFrame.img.pack(side=RIGHT, fill=BOTH)
