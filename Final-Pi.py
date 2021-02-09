@@ -23,16 +23,27 @@ class ControlFrame(Frame):
 
         # Enter ingredients' label
         ControlFrame.instructLabel = Label(
-            self, text="Enter Some Ingredients", font='verdana 15')
+            window, text="Enter Some Ingredients", font='verdana 15')
         ControlFrame.instructLabel.pack(anchor=N)
 
         # Creates the Textbox
-        ControlFrame.user_input = Entry(self, bg="white", font='kristen 16')
-        ControlFrame.user_input.pack(side=TOP, fill=X)
-        # Cursor is set('focused') on the Textbox
-        ControlFrame.user_input.focus()
+        ControlFrame.user_input = Entry(
+            window, bg="white", font='kristen 16')
         # Binds enter key to process input from user
         ControlFrame.user_input.bind("<Return>", self.process)
+        ControlFrame.user_input.pack(side=TOP, fill=X, pady=5)
+        # Cursor is set('focused') on the Textbox
+        ControlFrame.user_input.focus()
+
+        # Creates 'How Many Re..' label
+        ControlFrame.resultAmntL = Label(
+            self, font="helvetica 14", text="How Many Recipes?")
+        ControlFrame.resultAmntL.grid(column=0, row=0)
+        # Creates input box
+        ControlFrame.resultAmnt = Entry(
+            self, bg="white", font="helvetica 14", width=3)
+        ControlFrame.resultAmnt.insert(0, "5")
+        ControlFrame.resultAmnt.grid(column=1, row=0)
 
     def process(self, event):
         # Take the input from the input line and sets them all to lower case
@@ -42,7 +53,7 @@ class ControlFrame(Frame):
 
         # Sets response to the retrieved recipes from the website
         response = requests.get(
-            f"https://api.spoonacular.com/recipes/complexSearch?apiKey={api_key}&includeIngredients={','.join(ingredients)}&number=2&fillIngredients=true&addRecipeInformation=true")
+            f"https://api.spoonacular.com/recipes/findByIngredients?apiKey={api_key}&ingredients={','.join(ingredients)}&number={ControlFrame.resultAmnt.get()}")
         responseJSON = response.json()
 
         # Create list of recipe items
@@ -57,7 +68,10 @@ class ControlFrame(Frame):
 
         else:
             ControlFrame.instructLabel.config(
-                text="Results", fg="black", font="helvetica 15")
+                text="Enter Ingredients", fg="black", font="helvetica 15")
+
+        # list of recipes
+        ControlFrame.Recipes = [Recipe(recipeJSON) for recipeJSON in responseJSON]
 
         # Adds recipes to the list
         for recipe in ControlFrame.Recipes:
@@ -65,8 +79,6 @@ class ControlFrame(Frame):
 
         # Resets the Textbox after input
         ControlFrame.user_input.delete(0, END)
-
-        ControlFrame.responseLabel.configure(text=response.elasped)
 
 
 class Recipe():
@@ -92,6 +104,7 @@ class ResultFrame(Frame):
     def setupGUI(self):
         self.pack(side=TOP, expand=1, fill=BOTH)
 
+        # Building the bottom frame
         ResultFrame.RecipeInfo = Text(
             self, state=DISABLED, wrap=WORD, font='Times')
         ResultFrame.RecipeInfo.pack(side=RIGHT, fill=BOTH)
@@ -99,6 +112,7 @@ class ResultFrame(Frame):
         ResultFrame.instructLabel = Label(self, text="Your list of recipes")
         ResultFrame.instructLabel.pack(anchor=N)
 
+        # Adds back button
         ResultFrame.BackButton = Button(
             self, text="Back to options", command=rFrame)
 
@@ -149,7 +163,7 @@ class ResultFrame(Frame):
                 ResultFrame.RecipeInfo.delete("1.0", END)
                 summary = responseJSON["summary"]
                 # Discard similir recipes
-                summary = summary[0: summar.rfind("Try <a href=")]
+                summary = summary[0: summary.rfind("Try <a href=")]
 
                 ControlFrame.Recipes[ResultFrame.myList.curselection()[
                     0]].summary = summary
