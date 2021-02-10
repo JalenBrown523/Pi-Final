@@ -157,9 +157,17 @@ class ResultFrame(Frame):
             # pack the recipe frame
             rFrame.pack(side=TOP, expand=1, fill=BOTH)
 
+            ResultFrame.RecipeSum.pack(anchor=N, side=RIGHT, fill=BOTH, expand=1)
+            ResultFrame.imgLabel.pack(anchor=NW, fill=BOTH, side=TOP)
+            ResultFrame.dumbFrame.pack_forget()
+            ResultFrame.dumbFrame.pack(side=TOP, fill=BOTH, expand=1)
+            ResultFrame.myList.pack_forget()
+            ResultFrame.myList.pack(side=BOTTOM, expand=1, fill=BOTH)
 
 
-
+            # Textbox editable
+            ResultFrame.RecipeInfo.config(state=NORMAL)
+            ResultFrame.RecipeInfo.delete("1.0", END)
 
             # Recipes info won't be repeated
             if (hasattr(recipe, ("summary"))):
