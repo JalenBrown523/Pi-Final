@@ -18,9 +18,6 @@ class ControlFrame(Frame):
 
     # Sets up the GUI
     def setupGUI(self):
-        # Makes the frame the size of the window
-        self.pack(side=TOP, expand=1, fill=BOTH)
-
         # Enter ingredients' label
         ControlFrame.instructLabel = Label(
             window, text="Enter Some Ingredients", font='verdana 15')
@@ -34,6 +31,9 @@ class ControlFrame(Frame):
         ControlFrame.user_input.pack(side=TOP, fill=X, pady=5)
         # Cursor is set('focused') on the Textbox
         ControlFrame.user_input.focus()
+
+        # Makes the frame the size of the window
+        self.pack(side=TOP, expand=1, fill=BOTH)
 
         # Creates 'How Many Re..' label
         ControlFrame.resultAmntL = Label(
@@ -101,22 +101,30 @@ class ResultFrame(Frame):
         # Call the constructor in the superclass
         Frame.__init__(self, parent)
 
+    # View recipe options
+    def listReicpes(Frame):
+        rFrame.pack_forget()
+        cFrame.pack(side=TOP, expand=1, fill=BOTH)
+        ResultFrame.bottomFrame.pack_forget()
+        ResultFrame.bottomFrame.pack(side=TOP, fill=X)
+        ResultFrame.backButton.pack_forget()
+
     def setupGUI(self):
-        self.pack(side=TOP, expand=1, fill=BOTH)
-
         # Builds bottom frame
-        bottomFrame = Frame(window)
-        bottomFrame.pack(side=TOP, fill=X)
+        ResultFrame.bottomFrame = Frame(window)
+        ResultFrame.bottomFrame.pack(side=TOP, fill=X)
 
-        ResultFrame.instructLabel = Label(bottomFrame, text="Your list of recipes")
+        ResultFrame.instructLabel = Label(ResultFrame.bottomFrame, text="Your list of recipes")
         ResultFrame.instructLabel.pack(anchor=N)
 
         # Adds back button
-        ResultFrame.BackButton = Button(
-            self, text="Back to list", command=rFrame)
+        ResultFrame.backButton = Button(
+            window, text="Back to list", command=rFrame)
 
         ResultFrame.img = Label(self)
         ResultFrame.img.pack(side=RIGHT, fill=BOTH)
+
+        ResultFrame.RecipeInfo = Text(self, state=DISABLED, wrap=WORD, font='helvetica', height=10, width=40)
 
         # Create list
         ResultFrame.myList = Listbox(window, font='Times 12')
@@ -131,6 +139,8 @@ class ResultFrame(Frame):
         ResultFrame.myList.config(yscrollcommand=ResultFrame.scroll.set)
         ResultFrame.scroll.config(command=ResultFrame.myList.yview)
 
+        self.pack(side=TOP, expand=1, fill=BOTH)
+
     def addRecipe(self, Recipe):
         ResultFrame.myList.insert(END,
                                   f"{Recipe.title}  |  Likes: {Recipe.likes}  |  Missing Ingredients: {Recipe.ingMiss}")
@@ -140,8 +150,16 @@ class ResultFrame(Frame):
         if (ResultFrame.myList.curselection()):
             recipe = ControlFrame.Recipes[ResultFrame.myList.curselection()[0]]
 
-            # Textbox editable
-            ResultFrame.RecipeInfo.config(state=NORMAL)
+            # Disable controls
+            cFrame.pack_forget()
+            # Adds option button
+            rFrame.backButton.pack(side=RIGHT, padx=5)
+            # pack the recipe frame
+            rFrame.pack(side=TOP, expand=1, fill=BOTH)
+
+
+
+
 
             # Recipes info won't be repeated
             if (hasattr(recipe, ("summary"))):
@@ -171,7 +189,7 @@ class ResultFrame(Frame):
                     END, f"{recipe.title}\n\n{cleanSum}")
                 # Gives the summary box bold text
                 ResultFrame.formatSummary(
-                    self, ControlFrame.Recipies[ResultFrame.myList.curselection()[0]])
+                    self, ControlFrame.Recipes[ResultFrame.myList.curselection()[0]])
             # check if recipe already has the image downloaded
             if (hasattr(ControlFrame.Recipies[ResultFrame.myList.curselection()[0]], "photo")):
                 ResultFrame.imgLabel.config(
