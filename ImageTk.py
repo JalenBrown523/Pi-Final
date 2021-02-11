@@ -66,11 +66,9 @@ class PhotoImage:
     A Tkinter-compatible photo image.  This can be used
     everywhere Tkinter expects an image object.  If the image is an RGBA
     image, pixels having alpha 0 are treated as transparent.
-
     The constructor takes either a PIL image, or a mode and a size.
     Alternatively, you can use the ``file`` or ``data`` options to initialize
     the photo image object.
-
     :param image: Either a PIL image, or a mode string.  If a mode string is
                   used, a size must also be given.
     :param size: If the first argument is a mode string, this defines the size
@@ -126,7 +124,6 @@ class PhotoImage:
         Get the Tkinter photo image identifier.  This method is automatically
         called by Tkinter whenever a PhotoImage object is passed to a Tkinter
         method.
-
         :return: A Tkinter photo image identifier (a string).
         """
         return str(self.__photo)
@@ -134,7 +131,6 @@ class PhotoImage:
     def width(self):
         """
         Get the width of the image.
-
         :return: The width, in pixels.
         """
         return self.__size[0]
@@ -142,7 +138,6 @@ class PhotoImage:
     def height(self):
         """
         Get the height of the image.
-
         :return: The height, in pixels.
         """
         return self.__size[1]
@@ -151,7 +146,6 @@ class PhotoImage:
         """
         Paste a PIL image into the photo image.  Note that this can
         be very slow if the photo image is displayed.
-
         :param im: A PIL image. The size must match the target region.  If the
                    mode does not match, the image is converted to the mode of
                    the bitmap image.
@@ -207,13 +201,11 @@ class BitmapImage:
     """
     A Tkinter-compatible bitmap image.  This can be used everywhere Tkinter
     expects an image object.
-
     The given image must have mode "1".  Pixels having value 0 are treated as
     transparent.  Options, if any, are passed on to Tkinter.  The most commonly
     used option is ``foreground``, which is used to specify the color for the
     non-transparent parts.  See the Tkinter documentation for information on
     how to specify colours.
-
     :param image: A PIL image.
     """
 
@@ -247,7 +239,6 @@ class BitmapImage:
     def width(self):
         """
         Get the width of the image.
-
         :return: The width, in pixels.
         """
         return self.__size[0]
@@ -255,7 +246,6 @@ class BitmapImage:
     def height(self):
         """
         Get the height of the image.
-
         :return: The height, in pixels.
         """
         return self.__size[1]
@@ -265,7 +255,6 @@ class BitmapImage:
         Get the Tkinter bitmap image identifier.  This method is automatically
         called by Tkinter whenever a BitmapImage object is passed to a Tkinter
         method.
-
         :return: A Tkinter bitmap image identifier (a string).
         """
         return str(self.__photo)
