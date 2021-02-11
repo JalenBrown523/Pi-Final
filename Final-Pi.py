@@ -116,6 +116,7 @@ class ResultFrame(Frame):
         cFrame.pack(side=TOP, expand=1, fill=BOTH)
         ResultFrame.bottomFrame.pack_forget()
         ResultFrame.bottomFrame.pack(side=TOP, fill=X)
+        ResultFrame.backButton.pack_forget()
 
     def setupGUI(self):
         self.pack(side=TOP, expand=1, fill=BOTH)
@@ -128,8 +129,7 @@ class ResultFrame(Frame):
         ResultFrame.instructLabel.pack(side=LEFT, pady=6)
 
         # Adds back button
-        ResultFrame.instructLabel = Button(ResultFrame.bottomFrame, text="Back", font="helvetica 10", command=rFrame.listReicpes())
-        ResultFrame.instructLabel.pack(anchor=E, side=RIGHT, pady=6)
+        ResultFrame.backButton = Button(ResultFrame.bottomFrame, text="Back", font="helvetica 10", command=rFrame.listReicpes)
 
         ResultFrame.recipeInfo = Text(
             self, state=DISABLED, wrap=WORD, font='helvetica', height=10, width=40)
@@ -150,7 +150,7 @@ class ResultFrame(Frame):
 
     def addRecipe(self, Recipe):
         ResultFrame.myList.insert(END,
-                                  f"{Recipe.title}  |  Likes: {Recipe.likes}  |  Missing Ingredients: {Recipe.ingUsed}")
+                                  f"{Recipe.title}  |  Likes: {Recipe.likes}  |  Missing Ingredients: {Recipe.ingMissCnt}")
 
     def expandRecipe(self, event):
         # Runs if a recipe is selected
