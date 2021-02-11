@@ -70,7 +70,7 @@ class ControlFrame(Frame):
             ControlFrame.instructLabel.config(
                 text="Enter Ingredients", fg="black", font="helvetica 15")
 
-        # list of recipes
+        # List of recipes
         ControlFrame.Recipes = [Recipe(recipeJSON)
                                 for recipeJSON in responseJSON]
 
@@ -118,12 +118,13 @@ class ResultFrame(Frame):
         ResultFrame.bottomFrame.pack(side=TOP, fill=X)
 
     def setupGUI(self):
+        self.pack(side=TOP, expand=1, fill=BOTH)
         # Builds bottom frame
         ResultFrame.bottomFrame = Frame(window)
         ResultFrame.bottomFrame.pack(side=TOP, fill=X)
 
         ResultFrame.instructLabel = Label(
-            ResultFrame.bottomFrame, text="Your list of recipes")
+            ResultFrame.bottomFrame, text="Your list of recipes:", font= 'Times 12 bold')
         ResultFrame.instructLabel.pack(side=LEFT, pady=6)
 
         # Adds back button
@@ -143,12 +144,9 @@ class ResultFrame(Frame):
         # Setup scroll bar
         ResultFrame.scroll = Scrollbar(window)
         ResultFrame.scroll.pack(side=RIGHT, fill=Y)
-
-        # Link scroll option to listbox
+        # Link scroll to listbox
         ResultFrame.myList.config(yscrollcommand=ResultFrame.scroll.set)
         ResultFrame.scroll.config(command=ResultFrame.myList.yview)
-
-        self.pack(side=TOP, expand=1, fill=BOTH)
 
     def addRecipe(self, Recipe):
         ResultFrame.myList.insert(END,
@@ -207,7 +205,6 @@ class ResultFrame(Frame):
 
             if (len(steplist) > 0):
                 recstep = ", ".join(steplist)
-                # print (recstep)
                 ResultFrame.recipeInfo.insert(END, f"Steps: {recstep}")
                 ResultFrame.recipeInfo.config(state=DISABLED)
 
