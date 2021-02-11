@@ -27,7 +27,7 @@ class ControlFrame(Frame):
         ControlFrame.user_input = Entry(
             window, bg="white", font='kristen 16')
         # Binds enter key to process input from user
-        ControlFrame.user_input.bind("<Return>", self.process)
+        ControlFrame.user_input.bind('<Return>', self.process)
         ControlFrame.user_input.pack(side=TOP, fill=X, pady=5)
         # Cursor is set('focused') on the Textbox
         ControlFrame.user_input.focus()
@@ -71,7 +71,8 @@ class ControlFrame(Frame):
                 text="Enter Ingredients", fg="black", font="helvetica 15")
 
         # list of recipes
-        ControlFrame.Recipes = [Recipe(recipeJSON) for recipeJSON in responseJSON]
+        ControlFrame.Recipes = [Recipe(recipeJSON)
+                                for recipeJSON in responseJSON]
 
         # Adds recipes to the list
         for recipe in ControlFrame.Recipes:
@@ -100,7 +101,6 @@ class Recipe():
                 i += 1
         self.ingMissCnt = recipeJSON["missedIngredientCount"] - i
 
-
     def __str__(self):
         return self.title
 
@@ -116,23 +116,24 @@ class ResultFrame(Frame):
         cFrame.pack(side=TOP, expand=1, fill=BOTH)
         ResultFrame.bottomFrame.pack_forget()
         ResultFrame.bottomFrame.pack(side=TOP, fill=X)
-        ResultFrame.backButton.pack_forget()
 
     def setupGUI(self):
         # Builds bottom frame
         ResultFrame.bottomFrame = Frame(window)
         ResultFrame.bottomFrame.pack(side=TOP, fill=X)
 
-        ResultFrame.instructLabel = Label(ResultFrame.bottomFrame, text="Your list of recipes")
-        ResultFrame.instructLabel.pack(anchor=N)
+        ResultFrame.instructLabel = Label(
+            ResultFrame.bottomFrame, text="Your list of recipes")
+        ResultFrame.instructLabel.pack(side=LEFT, pady=6)
 
         # Adds back button
-        ResultFrame.backButton = Button(
-            window, text="Back to list", command=rFrame)
+        ResultFrame.instructLabel = Button(ResultFrame.bottomFrame, text="Back", font="helvetica 10", command=rFrame.listReicpes())
+        ResultFrame.instructLabel.pack(anchor=E, side=RIGHT, pady=6)
 
-        ResultFrame.img = Label(self)
+        ResultFrame.recipeInfo = Text(
+            self, state=DISABLED, wrap=WORD, font='helvetica', height=10, width=40)
 
-        ResultFrame.recipeInfo = Text(self, state=DISABLED, wrap=WORD, font='helvetica', height=10, width=40)
+        ResultFrame.img = Label(self, height=0, width=0)
 
         # Create list
         ResultFrame.myList = Listbox(window, font='Times 12')
@@ -160,18 +161,16 @@ class ResultFrame(Frame):
 
             # Disable controls
             cFrame.pack_forget()
-            # Adds option button
-            rFrame.backButton.pack(side=RIGHT, padx=5)
             # pack the recipe frame
             rFrame.pack(side=TOP, expand=1, fill=BOTH)
 
-            ResultFrame.recipeInfo.pack(anchor=N, side=RIGHT, fill=BOTH, expand=1)
+            ResultFrame.recipeInfo.pack(
+                anchor=N, side=RIGHT, fill=BOTH, expand=1)
             ResultFrame.img.pack(anchor=NW, fill=BOTH, side=TOP)
             ResultFrame.bottomFrame.pack_forget()
             ResultFrame.bottomFrame.pack(side=TOP, fill=BOTH, expand=1)
             ResultFrame.myList.pack_forget()
             ResultFrame.myList.pack(side=BOTTOM, expand=1, fill=BOTH)
-
 
             # Textbox editable
             ResultFrame.recipeInfo.config(state=NORMAL)
@@ -187,27 +186,30 @@ class ResultFrame(Frame):
                     steplist.append(steps['step'])
 
             if (hasattr(ControlFrame.Recipes[ResultFrame.myList.curselection()[0]], "photo")):
-                Rphoto = ControlFrame.Recipes[ResultFrame.myList.curselection()[0]].photo
-                RecipeFrame.imgLabel.config(image=Rphoto)
+                Rphoto = ControlFrame.Recipes[ResultFrame.myList.curselection()[
+                    0]].photo
+                ResultFrame.imgLabel.config(image=Rphoto)
                 # RecipeFrame.RecipeSum.config(width=int((800 - Rphoto.width())/12.08))
             else:
                 response = requests.get(recipe.img)
-                image = Image.open(BytesIO(response.content)).resize((312, 231))
+                image = Image.open(BytesIO(response.content)
+                                   ).resize((312, 231))
                 photo = ImageTk.PhotoImage(image)
                 # save photo to og recipe object-
-                ControlFrame.Recipes[ResultFrame.myList.curselection()[0]].photo = photo
+                ControlFrame.Recipes[ResultFrame.myList.curselection()[
+                    0]].photo = photo
                 ResultFrame.img.config(image=photo)
 
             if (len(recipe.missedIng) > 0):
                 ingredients = ", ".join(recipe.missedIng)
-                ResultFrame.recipeInfo.insert("1.0", f"Missing Ingredients: {ingredients}\n")
+                ResultFrame.recipeInfo.insert(
+                    "1.0", f"Missing Ingredients: {ingredients}\n")
 
             if (len(steplist) > 0):
                 recstep = ", ".join(steplist)
                 # print (recstep)
                 ResultFrame.recipeInfo.insert(END, f"Steps: {recstep}")
                 ResultFrame.recipeInfo.config(state=DISABLED)
-
 
     def formatSummary(self, summary, recipe):
         word_connect = re.finditer(r"<b>(.+?) <\b >", summary)
