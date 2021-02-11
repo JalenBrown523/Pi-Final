@@ -90,7 +90,16 @@ class Recipe():
         self.img = recipeJSON["image"]
         self.likes = recipeJSON["likes"]
         self.ingUsed = recipeJSON["usedIngredientCount"]
-        self.ingMiss = recipeJSON["missedIngredientCount"]
+        self.missedIng = []
+
+        i = 0
+        for ing in recipeJSON["missedIngredients"]:
+            if (ing["name"] not in self.missedIng):
+                self.missedIng.append(ing["name"])
+            else:
+                i += 1
+        self.ingMissCnt = recipeJSON["missedIngredientCount"] - i
+
 
     def __str__(self):
         return self.title
@@ -122,9 +131,8 @@ class ResultFrame(Frame):
             window, text="Back to list", command=rFrame)
 
         ResultFrame.img = Label(self)
-        ResultFrame.img.pack(side=RIGHT, fill=BOTH)
 
-        ResultFrame.RecipeInfo = Text(self, state=DISABLED, wrap=WORD, font='helvetica', height=10, width=40)
+        ResultFrame.recipeInfo = Text(self, state=DISABLED, wrap=WORD, font='helvetica', height=10, width=40)
 
         # Create list
         ResultFrame.myList = Listbox(window, font='Times 12')
@@ -143,7 +151,7 @@ class ResultFrame(Frame):
 
     def addRecipe(self, Recipe):
         ResultFrame.myList.insert(END,
-                                  f"{Recipe.title}  |  Likes: {Recipe.likes}  |  Missing Ingredients: {Recipe.ingMiss}")
+                                  f"{Recipe.title}  |  Likes: {Recipe.likes}  |  Missing Ingredients: {Recipe.ingUsed}")
 
     def expandRecipe(self, event):
         # Runs if a recipe is selected
@@ -157,59 +165,49 @@ class ResultFrame(Frame):
             # pack the recipe frame
             rFrame.pack(side=TOP, expand=1, fill=BOTH)
 
-            ResultFrame.RecipeSum.pack(anchor=N, side=RIGHT, fill=BOTH, expand=1)
-            ResultFrame.imgLabel.pack(anchor=NW, fill=BOTH, side=TOP)
-            ResultFrame.dumbFrame.pack_forget()
-            ResultFrame.dumbFrame.pack(side=TOP, fill=BOTH, expand=1)
+            ResultFrame.recipeInfo.pack(anchor=N, side=RIGHT, fill=BOTH, expand=1)
+            ResultFrame.img.pack(anchor=NW, fill=BOTH, side=TOP)
+            ResultFrame.bottomFrame.pack_forget()
+            ResultFrame.bottomFrame.pack(side=TOP, fill=BOTH, expand=1)
             ResultFrame.myList.pack_forget()
             ResultFrame.myList.pack(side=BOTTOM, expand=1, fill=BOTH)
 
 
             # Textbox editable
-            ResultFrame.RecipeInfo.config(state=NORMAL)
-            ResultFrame.RecipeInfo.delete("1.0", END)
+            ResultFrame.recipeInfo.config(state=NORMAL)
+            ResultFrame.recipeInfo.delete("1.0", END)
 
-            # Recipes info won't be repeated
-            if (hasattr(recipe, ("summary"))):
-                # clear textbox
-                ResultFrame.RecipeInfo.delete("1.0", END)
-                cleanSum = recipe.summary.replace("<b>", "").replace("<b>", "")
-                ResultFrame.RecipeInfo.insert(
-                    END, f"{recipe.title}\n\n{cleanSum}")
-                ResultFrame.formatSummary(self, recipe)
+            instruct = requests.get(
+                f"https://api.spoonacular.com/recipes/{recipe.id}/analyzedInstructions?apiKey={api_key}")
+            instructions = instruct.json()
+            steplist = []
+            for ins in instructions:
+                instructionList = ins['steps']
+                for steps in instructionList:
+                    steplist.append(steps['step'])
 
-            else:
-                response = requests.get(
-                    f"https://api.spoonacular.com/recipes/{recipe.id}/information?apiKey={api_key}")
-                responseJSON = response.json()
-                ResultFrame.RecipeInfo.config(state=NORMAL)
-
-                # Clear textbox
-                ResultFrame.RecipeInfo.delete("1.0", END)
-                summary = responseJSON["summary"]
-                # Discard similir recipes
-                summary = summary[0: summary.rfind("Try <a href=")]
-
-                ControlFrame.Recipes[ResultFrame.myList.curselection()[
-                    0]].summary = summary
-                cleanSum = summary.replace("<b>", "").replace("</b>", "")
-                ResultFrame.RecipeInfo.insert(
-                    END, f"{recipe.title}\n\n{cleanSum}")
-                # Gives the summary box bold text
-                ResultFrame.formatSummary(
-                    self, ControlFrame.Recipes[ResultFrame.myList.curselection()[0]])
-            # check if recipe already has the image downloaded
-            if (hasattr(ControlFrame.Recipies[ResultFrame.myList.curselection()[0]], "photo")):
-                ResultFrame.imgLabel.config(
-                    image=ControlFrame.Recipies[ResultFrame.myList.curselection()[0]].photo)
+            if (hasattr(ControlFrame.Recipes[ResultFrame.myList.curselection()[0]], "photo")):
+                Rphoto = ControlFrame.Recipes[ResultFrame.myList.curselection()[0]].photo
+                RecipeFrame.imgLabel.config(image=Rphoto)
+                # RecipeFrame.RecipeSum.config(width=int((800 - Rphoto.width())/12.08))
             else:
                 response = requests.get(recipe.img)
-                image = Image.open(BytesIO(response.content))
+                image = Image.open(BytesIO(response.content)).resize((312, 231))
                 photo = ImageTk.PhotoImage(image)
-                # save photo to og recipe object
-                ControlFrame.Recipes[ResultFrame.myList.curselection()[
-                    0]].photo = photo
-                ResultFrame.imgLabel.config(image=photo)
+                # save photo to og recipe object-
+                ControlFrame.Recipes[ResultFrame.myList.curselection()[0]].photo = photo
+                ResultFrame.img.config(image=photo)
+
+            if (len(recipe.missedIng) > 0):
+                ingredients = ", ".join(recipe.missedIng)
+                ResultFrame.recipeInfo.insert("1.0", f"Missing Ingredients: {ingredients}\n")
+
+            if (len(steplist) > 0):
+                recstep = ", ".join(steplist)
+                # print (recstep)
+                ResultFrame.recipeInfo.insert(END, f"Steps: {recstep}")
+                ResultFrame.recipeInfo.config(state=DISABLED)
+
 
     def formatSummary(self, summary, recipe):
         word_connect = re.finditer(r"<b>(.+?) <\b >", summary)
