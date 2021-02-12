@@ -1,5 +1,6 @@
 from tkinter import *
 import re
+from typing import OrderedDict
 import requests
 import ImageTk
 from io import BytesIO
@@ -48,6 +49,7 @@ class ControlFrame(Frame):
     def process(self, event):
         # Take the input from the input line and sets them all to lower case
         action = ControlFrame.user_input.get().lower()
+
         # No two word ingredients (e.g. rice cakes = rice, cakes)
         ingredients = action.split()
 
@@ -56,11 +58,7 @@ class ControlFrame(Frame):
             f"https://api.spoonacular.com/recipes/findByIngredients?apiKey={api_key}&ingredients={','.join(ingredients)}&number={ControlFrame.resultAmnt.get()}")
         responseJSON = response.json()
 
-        # Create list of recipe items
-        ControlFrame.Recipes = [Recipe(recipeJSON)
-                                for recipeJSON in responseJSON]
-
-        # If responsejson is an empTy string(ex. no response) then change the text of the instruction label
+        # If responsejson is an empty string (no response) then change text
         # Handles invalid input from the user
         if (responseJSON == []):
             ControlFrame.instructLabel.config(
@@ -76,10 +74,7 @@ class ControlFrame(Frame):
 
         # Adds recipes to the list
         for recipe in ControlFrame.Recipes:
-            rFrame.addRecipe(recipe)
-
-        # Resets the Textbox after input
-        ControlFrame.user_input.delete(0, END)
+            ResultFrame.addRecipe(self, recipe)
 
 
 class Recipe():
@@ -120,6 +115,7 @@ class ResultFrame(Frame):
 
     def setupGUI(self):
         self.pack(side=TOP, expand=1, fill=BOTH)
+
         # Builds bottom frame
         ResultFrame.bottomFrame = Frame(window)
         ResultFrame.bottomFrame.pack(side=TOP, fill=X)
@@ -131,19 +127,22 @@ class ResultFrame(Frame):
         # Adds back button
         ResultFrame.backButton = Button(ResultFrame.bottomFrame, text="Back", command=rFrame.listReicpes)
 
+        ResultFrame.instructLabel = Label(ResultFrame.bottomFrame, text="Recipes", font="helvetica 10 bold")
+
         ResultFrame.recipeInfo = Text(
             self, state=DISABLED, wrap=WORD, font='helvetica', height=10, width=40)
 
         ResultFrame.img = Label(self, height=0, width=0)
 
-        # Create list
-        ResultFrame.myList = Listbox(window, font='Times 12')
-        ResultFrame.myList.pack(side=TOP, expand=1, fill=BOTH)
-        ResultFrame.myList.bind('<<ListboxSelect>>', self.expandRecipe)
-
-        # Setup scroll bar up/down
+        # Setup scroll bar
         ResultFrame.scroll = Scrollbar(window)
         ResultFrame.scroll.pack(side=RIGHT, fill=Y)
+
+        # Create list
+        ResultFrame.myList = Listbox(window, font='Times 12')
+        ResultFrame.myList.pack(side=BOTTOM, expand=1, fill=BOTH)
+        ResultFrame.myList.bind('<<ListboxSelect>>', self.expandRecipe)
+
         # Link scroll to listbox
         ResultFrame.myList.config(yscrollcommand=ResultFrame.scroll.set)
         ResultFrame.scroll.config(command=ResultFrame.myList.yview)
@@ -159,8 +158,13 @@ class ResultFrame(Frame):
 
             # Disable controls
             cFrame.pack_forget()
+
+            # Back button
+            rFrame.backButton.pack(side=RIGHT, padx=5)
+
             # pack the recipe frame
             rFrame.pack(side=TOP, expand=1, fill=BOTH)
+
 
             ResultFrame.recipeInfo.pack(
                 anchor=N, side=RIGHT, fill=BOTH, expand=1)
