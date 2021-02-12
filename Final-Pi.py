@@ -129,7 +129,7 @@ class ResultFrame(Frame):
         ResultFrame.instructLabel.pack(side=LEFT, pady=6)
 
         # Adds back button
-        ResultFrame.backButton = Button(ResultFrame.bottomFrame, text="Back", font="helvetica 10", command=rFrame.listReicpes)
+        ResultFrame.backButton = Button(ResultFrame.bottomFrame, text="Back", command=rFrame.listReicpes)
 
         ResultFrame.recipeInfo = Text(
             self, state=DISABLED, wrap=WORD, font='helvetica', height=10, width=40)
@@ -141,7 +141,7 @@ class ResultFrame(Frame):
         ResultFrame.myList.pack(side=TOP, expand=1, fill=BOTH)
         ResultFrame.myList.bind('<<ListboxSelect>>', self.expandRecipe)
 
-        # Setup scroll bar
+        # Setup scroll bar up/down
         ResultFrame.scroll = Scrollbar(window)
         ResultFrame.scroll.pack(side=RIGHT, fill=Y)
         # Link scroll to listbox
@@ -186,7 +186,7 @@ class ResultFrame(Frame):
             if (hasattr(ControlFrame.Recipes[ResultFrame.myList.curselection()[0]], "photo")):
                 Rphoto = ControlFrame.Recipes[ResultFrame.myList.curselection()[
                     0]].photo
-                ResultFrame.imgLabel.config(image=Rphoto)
+                ResultFrame.img.config(image=Rphoto)
                 # RecipeFrame.RecipeSum.config(width=int((800 - Rphoto.width())/12.08))
             else:
                 response = requests.get(recipe.img)
@@ -201,12 +201,18 @@ class ResultFrame(Frame):
             if (len(recipe.missedIng) > 0):
                 ingredients = ", ".join(recipe.missedIng)
                 ResultFrame.recipeInfo.insert(
-                    "1.0", f"Missing Ingredients: {ingredients}\n")
+                    "1.0", f"Missing Ingredients: {ingredients}\n\n")
 
-            if (len(steplist) > 0):
-                recstep = ", ".join(steplist)
-                ResultFrame.recipeInfo.insert(END, f"Steps: {recstep}")
-                ResultFrame.recipeInfo.config(state=DISABLED)
+            linenum = 3.0
+            stepnum = 1
+            listincrement = 0
+            for i in steplist:
+                ResultFrame.recipeInfo.insert(f"{linenum}", f"Step {stepnum}: {steplist[listincrement]} \n\n")
+
+                linenum += 2.0
+                stepnum += 1
+                listincrement += 1
+            ResultFrame.recipeInfo.config(state=DISABLED)
 
     def formatSummary(self, summary, recipe):
         word_connect = re.finditer(r"<b>(.+?) <\b >", summary)
