@@ -1,10 +1,10 @@
 from tkinter import *
 import re
-from typing import OrderedDict
 import requests
 import ImageTk
 from io import BytesIO
 from PIL import Image
+
 # PIL library to import images
 
 
@@ -75,6 +75,9 @@ class ControlFrame(Frame):
         # Adds recipes to the list
         for recipe in ControlFrame.Recipes:
             ResultFrame.addRecipe(self, recipe)
+
+        # Deletes text after input
+        ControlFrame.user_input.delete(0, END)
 
 
 class Recipe():

@@ -1,0 +1,21 @@
+Presentation ideas:
+List some goals of the project
+- create a program to find recipes using random kitchen items
+- discovering new Python/Tkinter libraries & their usefulness
+-
+			
+
+Why is it relevant/useful?
+- 
+-
+
+What were some challenges?
+- getting familiar w/ JSON/API's & how they can be used to interface w/ other projects
+- learning how to retrieve only the desired info from database
+
+Future ideas/improvements?
+- add more functionality
+- improve styling
+
+#############
+Just brainstorming ideas, & any you find useful
