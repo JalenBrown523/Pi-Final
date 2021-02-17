@@ -1,9 +1,8 @@
 from tkinter import *
 import re
 import requests
-import ImageTk
 from io import BytesIO
-from PIL import Image
+from PIL import ImageTk, Image
 
 # PIL library to import images
 
@@ -29,7 +28,7 @@ class ControlFrame(Frame):
             window, bg="white", font='kristen 16')
         # Binds enter key to process input from user
         ControlFrame.user_input.bind('<Return>', self.process)
-        ControlFrame.user_input.pack(side=TOP, fill=X, pady=5)
+        ControlFrame.user_input.pack(side=TOP, fill=X)
         # Cursor is set('focused') on the Textbox
         ControlFrame.user_input.focus()
 
@@ -38,12 +37,13 @@ class ControlFrame(Frame):
 
         # Creates 'How Many Re..' label
         ControlFrame.resultAmntL = Label(
-            self, font="helvetica 14", text="How Many Recipes?")
+            self, font="helvetica 14", text="How Many Recipe Results?", bd=1, padx=10)
         ControlFrame.resultAmntL.grid(column=0, row=0)
         # Creates input box
         ControlFrame.resultAmnt = Entry(
             self, bg="white", font="helvetica 14", width=3)
-        ControlFrame.resultAmnt.insert(0, "5")
+        ControlFrame.resultAmnt.insert(0, "10")
+
         ControlFrame.resultAmnt.grid(column=1, row=0)
 
     def process(self, event):
@@ -124,11 +124,11 @@ class ResultFrame(Frame):
         ResultFrame.bottomFrame.pack(side=TOP, fill=X)
 
         ResultFrame.instructLabel = Label(
-            ResultFrame.bottomFrame, text="Your list of recipes:", font= 'Times 12 bold')
+            ResultFrame.bottomFrame, text="List of results:", font= 'Times 12 bold')
         ResultFrame.instructLabel.pack(side=LEFT, pady=6)
 
         # Adds back button
-        ResultFrame.backButton = Button(ResultFrame.bottomFrame, text="Back", command=rFrame.listReicpes)
+        ResultFrame.backButton = Button(ResultFrame.bottomFrame, text="Back", command=rFrame.listReicpes, bd=1, fg='red' )
 
         ResultFrame.instructLabel = Label(ResultFrame.bottomFrame, text="Recipes", font="helvetica 10 bold")
 
@@ -171,7 +171,7 @@ class ResultFrame(Frame):
 
             ResultFrame.recipeInfo.pack(
                 anchor=N, side=RIGHT, fill=BOTH, expand=1)
-            ResultFrame.img.pack(anchor=NW, fill=BOTH, side=TOP)
+            ResultFrame.img.pack(anchor=NW, fill=BOTH, side=BOTTOM)
             ResultFrame.bottomFrame.pack_forget()
             ResultFrame.bottomFrame.pack(side=TOP, fill=BOTH, expand=1)
             ResultFrame.myList.pack_forget()
@@ -242,7 +242,7 @@ HEIGHT = 600
 
 # Create the window
 window = Tk()
-window.title("Find A Recipe")
+window.title("You must be hungry...")
 window.geometry(f"{WIDTH}x{HEIGHT}")
 window.minsize(WIDTH, HEIGHT)
 
