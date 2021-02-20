@@ -4,8 +4,6 @@ import requests
 from io import BytesIO
 from PIL import ImageTk, Image
 
-# PIL library to import images
-
 
 class ControlFrame(Frame):
     # The constructor
@@ -124,13 +122,15 @@ class ResultFrame(Frame):
         ResultFrame.bottomFrame.pack(side=TOP, fill=X)
 
         ResultFrame.instructLabel = Label(
-            ResultFrame.bottomFrame, text="List of results:", font= 'Times 12 bold')
+            ResultFrame.bottomFrame, text="List of results:", font='Times 12 bold')
         ResultFrame.instructLabel.pack(side=LEFT, pady=6)
 
         # Adds back button
-        ResultFrame.backButton = Button(ResultFrame.bottomFrame, text="Back", command=rFrame.listReicpes, bd=1, fg='red' )
+        ResultFrame.backButton = Button(
+            ResultFrame.bottomFrame, text="Back", command=rFrame.listReicpes, bd=1, fg='red')
 
-        ResultFrame.instructLabel = Label(ResultFrame.bottomFrame, text="Recipes", font="helvetica 10 bold")
+        ResultFrame.instructLabel = Label(
+            ResultFrame.bottomFrame, text="Recipes", font="helvetica 10 bold")
 
         ResultFrame.recipeInfo = Text(
             self, state=DISABLED, wrap=WORD, font='helvetica', height=10, width=40)
@@ -167,7 +167,6 @@ class ResultFrame(Frame):
 
             # pack the recipe frame
             rFrame.pack(side=TOP, expand=1, fill=BOTH)
-
 
             ResultFrame.recipeInfo.pack(
                 anchor=N, side=RIGHT, fill=BOTH, expand=1)
@@ -214,7 +213,8 @@ class ResultFrame(Frame):
             stepnum = 1
             listincrement = 0
             for i in steplist:
-                ResultFrame.recipeInfo.insert(f"{linenum}", f"Step {stepnum}: {steplist[listincrement]} \n\n")
+                ResultFrame.recipeInfo.insert(
+                    f"{linenum}", f"Step {stepnum}: {steplist[listincrement]} \n\n")
 
                 linenum += 2.0
                 stepnum += 1
