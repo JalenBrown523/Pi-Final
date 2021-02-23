@@ -189,17 +189,20 @@ class ResultFrame(Frame):
                 for steps in instructionList:
                     steplist.append(steps['step'])
 
+            # If the frame has the image we will not send another get request
             if (hasattr(ControlFrame.Recipes[ResultFrame.myList.curselection()[0]], "photo")):
                 Rphoto = ControlFrame.Recipes[ResultFrame.myList.curselection()[
                     0]].photo
                 ResultFrame.img.config(image=Rphoto)
-                # RecipeFrame.RecipeSum.config(width=int((800 - Rphoto.width())/12.08))
+
+            # No image, we request the image via get
             else:
                 response = requests.get(recipe.img)
                 image = Image.open(BytesIO(response.content)
                                    ).resize((312, 231))
                 photo = ImageTk.PhotoImage(image)
-                # save photo to og recipe object-
+
+                # Storing photo to appropriate recipe
                 ControlFrame.Recipes[ResultFrame.myList.curselection()[
                     0]].photo = photo
                 ResultFrame.img.config(image=photo)
@@ -209,15 +212,16 @@ class ResultFrame(Frame):
                 ResultFrame.recipeInfo.insert(
                     "1.0", f"Missing Ingredients: {ingredients}\n\n")
 
-            linenum = 3.0
-            stepnum = 1
+    # Organizing recipe steps in the ResultFrame
+            linenumber = 3.0
+            stepnumber= 1
             listincrement = 0
             for i in steplist:
                 ResultFrame.recipeInfo.insert(
-                    f"{linenum}", f"Step {stepnum}: {steplist[listincrement]} \n\n")
+                    f"{linenumber}", f"Step {stepnumber}: {steplist[listincrement]} \n\n")
 
-                linenum += 2.0
-                stepnum += 1
+                linenumber += 2.0
+                stepnumber += 1
                 listincrement += 1
             ResultFrame.recipeInfo.config(state=DISABLED)
 
@@ -231,7 +235,7 @@ class ResultFrame(Frame):
                 f"1.0+{found_word.end()+len(recipe.title) + 2 - (i+1)*7} chars")
             ResultFrame.RecipeInfo.tag_add('bold', start, end)
             i += 1
-            ResultFrame.RecipeInfo.tag_configure('bold', font="Times 12")
+            ResultFrame.RecipeInfo.tag_configure('bold', font="Times 10")
 
 
 ##################################################################################
